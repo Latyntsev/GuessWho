@@ -31,17 +31,6 @@ struct UserRow: View {
 
 #Preview {
     List(0...2, id: \.self) { _ in
-        UserRow(
-            user: .init(
-                id: 1,
-                email: "test@debug.com",
-                password: "",
-                name: "Oleksandr Usyk",
-                role: "",
-                avatar: "",
-                creationAt: "",
-                updatedAt: ""
-            )
-        )
+        UserRow(user: .mock())
     }
 }

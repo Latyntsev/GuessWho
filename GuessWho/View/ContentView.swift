@@ -57,7 +57,7 @@ struct ContentView: View {
         NavigationStack {
             List(users, id: \.id) { user in
                 NavigationLink {
-                    Text("User details")
+                    UserDetails(user: user)
                 } label: {
                     UserRow(user: user)
                 }
