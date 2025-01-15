@@ -8,5 +8,5 @@
 import Foundation
 
 struct Config {
-    static let baseURL = "https://api.escuelajs.com"
+    static let baseURL = "https://api.escuelajs.co"
 }

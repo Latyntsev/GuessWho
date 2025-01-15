@@ -34,4 +34,8 @@ extension WebServiceProtocol {
     ) async throws -> T {
         try await request(method: .post, path: path, queryItems: queryItems, headers: headers, body: body)
     }
+    
+    func fetchUser() async throws -> [User] {
+        try await get(path: "/api/v1/users")
+    }
 }
