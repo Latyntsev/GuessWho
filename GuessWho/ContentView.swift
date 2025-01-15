@@ -8,24 +8,72 @@
 import SwiftUI
 
 struct ContentView: View {
+    enum ContantState: Equatable {
+        case loading
+        case loaded([User])
+        case error(Error)
+        
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            switch (lhs, rhs) {
+            case (.loading, .loading):
+                return true
+            case (.loaded, .loaded):
+                return true
+            case (.error, .error):
+                return true
+            default:
+                return false
+            }
+        }
+    }
     let dal = DI.dataAccessLayer
-    @State var users = [User]()
-    @State var error: Error?
+    @State var contentState = ContantState.loading
 
     var body: some View {
-        if let error {
+        content()
+            .animation(.easeInOut, value: contentState)
+            .task {
+                await fetchData()
+            }
+    }
+    
+    @ViewBuilder
+    private func content() -> some View {
+        switch contentState {
+        case .loading:
+            loadingState()
+        case .loaded(let users):
+            loadedState(users: users)
+        case .error(let error):
+            errorState(error: error)
+        }
+    }
+    
+    private func loadingState() -> some View {
+        ProgressView()
+    }
+    
+    private func loadedState(users: [User]) -> some View {
+        NavigationStack {
+            List(users, id: \.id) { user in
+                NavigationLink {
+                    Text("User details")
+                } label: {
+                    userRow(user: user)
+                }
+            }
+            .navigationTitle("Users")
+        }
+    }
+    
+    private func errorState(error: Error) -> some View {
+        VStack {
             Text("Error: \(error.localizedDescription)")
             Button("Retry") {
                 Task {
                     await fetchData()
                 }
             }
-        }
-        List(users, id: \.id) { user in
-            userRow(user: user)
-        }
-        .task {
-            await fetchData()
         }
     }
     
@@ -49,11 +97,11 @@ struct ContentView: View {
     }
     
     func fetchData() async {
-        error = nil
+        contentState = .loading
         do {
-            users = try await dal.fetchUsers()
+            contentState = .loaded(try await dal.fetchUsers())
         } catch {
-            self.error = error
+            contentState = .error(error)
         }
     }
 }
