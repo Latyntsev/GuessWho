@@ -55,11 +55,18 @@ struct ContentView: View {
     
     private func loadedState(users: [User]) -> some View {
         NavigationStack {
-            List(users, id: \.id) { user in
-                NavigationLink {
-                    UserDetails(user: user)
-                } label: {
-                    UserRow(user: user)
+            List {
+                ForEach(users, id: \.id) { user in
+                    NavigationLink {
+                        UserDetails(user: user)
+                    } label: {
+                        UserRow(user: user)
+                    }
+                }
+                .onDelete { indexSet in
+                    var users = users
+                    users.remove(atOffsets: indexSet)
+                    contentState = .loaded(users)
                 }
             }
             .navigationTitle("Users")
