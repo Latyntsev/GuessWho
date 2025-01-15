@@ -10,11 +10,11 @@ import os.log
 
 private let logger = Logger.dataAccessLayer
 
-actor DataAccessLayer {
-    let webService: WebService
+actor DataAccessLayer: DataAccessLayerProtocol {
+    let webService: WebServiceProtocol
     private var tasks: [String: Any] = [:]
     
-    init(webService: WebService) {
+    init(webService: WebServiceProtocol) {
         self.webService = webService
         logger.log("DataAccessLayer initialized")
     }
@@ -25,7 +25,6 @@ actor DataAccessLayer {
     ) async throws -> T {
         logger.log("accessing \(key)")
         if let task = tasks[key] as? Task<T, Error> {
-            tasks[key] = nil
             logger.log("task \(key) is already running")
             return try await task.value
         }
@@ -34,10 +33,16 @@ actor DataAccessLayer {
         }
         tasks[key] = task
         logger.log("starting task \(key)")
-        return try await task.value
+        do {
+            let data = try await task.value
+            tasks[key] = nil
+            return data
+        } catch {
+            tasks[key] = nil
+            throw error
+        }
     }
-        
-    
+
     func fetchUsers() async throws -> [User] {
         try await access(key: "fetchUsers") {
             try await self.webService.fetchUser()

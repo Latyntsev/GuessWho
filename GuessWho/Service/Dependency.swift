@@ -7,7 +7,15 @@
 
 import Foundation
 
+var DI = Dependency()
+
 struct Dependency {
-    let webService: WebService
-    let dataAccessLayer: DataAccessLayer    
+    let webService: WebServiceProtocol
+    let dataAccessLayer: DataAccessLayerProtocol
+        
+    init() {
+        let webService = WebService()
+        self.webService = webService
+        dataAccessLayer = DataAccessLayer(webService: webService)
+    }
 }
