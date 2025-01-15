@@ -59,7 +59,7 @@ struct ContentView: View {
                 NavigationLink {
                     Text("User details")
                 } label: {
-                    userRow(user: user)
+                    UserRow(user: user)
                 }
             }
             .navigationTitle("Users")
@@ -73,25 +73,6 @@ struct ContentView: View {
                 Task {
                     await fetchData()
                 }
-            }
-        }
-    }
-    
-    private func userRow(user: User) -> some View {
-        HStack(spacing: 10) {
-            AsyncImage(url: URL(string: user.avatar)) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-            } placeholder: {
-                ProgressView()
-            }
-            .frame(width: 50, height: 50)
-            .background(Color.teal)
-            .clipShape(Circle())
-            VStack(alignment: .leading) {
-                Text(user.name)
-                Text(user.email)
             }
         }
     }
